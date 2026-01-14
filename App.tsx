@@ -10,14 +10,15 @@ import PaymentDashboard from './components/PaymentDashboard';
 import ReportsDashboard from './components/ReportsDashboard';
 import Footer from './components/Footer';
 import PackageModal from './components/PackageModal';
-import { INITIAL_JAMAAH_DATA, INITIAL_PAYMENTS } from './constants';
+import { INITIAL_JAMAAH_DATA, INITIAL_PAYMENTS, UMRAH_PACKAGES as STATIC_PACKAGES } from './constants';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedPackage, setSelectedPackage] = useState<UmrahPackage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Global State
+  // Dynamic Global State
+  const [packages, setPackages] = useState<UmrahPackage[]>(STATIC_PACKAGES);
   const [jamaahList, setJamaahList] = useState<BookingForm[]>(INITIAL_JAMAAH_DATA);
   const [payments, setPayments] = useState<PaymentRecord[]>(INITIAL_PAYMENTS);
 
@@ -59,6 +60,21 @@ const App: React.FC = () => {
     setPayments(prev => prev.map(p => p.id === updated.id ? updated : p));
   };
 
+  // Package Management Handlers
+  const handleAddPackage = (pkg: UmrahPackage) => {
+    setPackages(prev => [...prev, { ...pkg, id: `pkg-${Date.now()}` }]);
+  };
+
+  const handleUpdatePackage = (updated: UmrahPackage) => {
+    setPackages(prev => prev.map(p => p.id === updated.id ? updated : p));
+  };
+
+  const handleDeletePackage = (id: string) => {
+    if (window.confirm('Hapus paket ini? Ini akan berdampak pada tampilan pendaftaran.')) {
+      setPackages(prev => prev.filter(p => p.id !== id));
+    }
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case 'home':
@@ -72,6 +88,7 @@ const App: React.FC = () => {
                   <p className="text-gray-600 max-w-2xl mx-auto">Pilih paket perjalanan ibadah yang sesuai dengan kebutuhan Anda. Kami menjamin kenyamanan dan kekhusyukan ibadah Anda.</p>
                 </div>
                 <PackageList 
+                  packages={packages}
                   onBookNow={handleBookNow} 
                   onPreview={handlePreview}
                 />
@@ -88,6 +105,7 @@ const App: React.FC = () => {
                 <p className="text-gray-600">Temukan jadwal keberangkatan terbaik untuk ibadah Anda.</p>
               </div>
               <PackageList 
+                packages={packages}
                 onBookNow={handleBookNow} 
                 onPreview={handlePreview}
               />
@@ -98,6 +116,7 @@ const App: React.FC = () => {
         return (
           <div className="pt-24 pb-20 bg-gray-50 min-h-screen">
             <RegistrationForm 
+              packages={packages}
               initialPackage={selectedPackage}
               onSuccess={(data) => {
                 handleAddJamaah(data);
@@ -111,8 +130,12 @@ const App: React.FC = () => {
           <div className="pt-24 pb-20 bg-gray-50 min-h-screen">
             <AdminDashboard 
               jamaahList={jamaahList} 
-              onUpdate={handleUpdateJamaah}
-              onDelete={handleDeleteJamaah}
+              packages={packages}
+              onUpdateJamaah={handleUpdateJamaah}
+              onDeleteJamaah={handleDeleteJamaah}
+              onAddPackage={handleAddPackage}
+              onUpdatePackage={handleUpdatePackage}
+              onDeletePackage={handleDeletePackage}
             />
           </div>
         );
@@ -122,6 +145,7 @@ const App: React.FC = () => {
             <PaymentDashboard 
               jamaahList={jamaahList}
               payments={payments}
+              packages={packages}
               onAddPayment={handleAddPayment}
               onUpdatePayment={handleUpdatePayment}
             />
@@ -133,6 +157,7 @@ const App: React.FC = () => {
             <ReportsDashboard 
               jamaahList={jamaahList}
               payments={payments}
+              packages={packages}
             />
           </div>
         );

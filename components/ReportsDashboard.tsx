@@ -1,26 +1,26 @@
 
 import React, { useState } from 'react';
 import { BookingForm, PaymentRecord, UmrahPackage } from '../types';
-import { UMRAH_PACKAGES } from '../constants';
 
 interface ReportsDashboardProps {
   jamaahList: BookingForm[];
   payments: PaymentRecord[];
+  packages: UmrahPackage[];
 }
 
-const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payments }) => {
+const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payments, packages }) => {
   const [reportType, setReportType] = useState<'jamaah' | 'payment' | 'finance'>('jamaah');
 
   const confirmedPayments = payments.filter(p => p.status === 'Diterima');
   const totalRevenue = confirmedPayments.reduce((sum, p) => sum + p.amount, 0);
   const totalReceivables = jamaahList.reduce((sum, j) => {
-    const pkg = UMRAH_PACKAGES.find(p => p.id === j.packageId);
+    const pkg = packages.find(p => p.id === j.packageId);
     const total = (pkg?.price || 0) * j.numberOfPersons;
     const paid = payments.filter(p => p.jamaahId === j.id && p.status === 'Diterima').reduce((s, p) => s + p.amount, 0);
     return sum + (total - paid);
   }, 0);
 
-  const packageStats = UMRAH_PACKAGES.map(pkg => ({
+  const packageStats = packages.map(pkg => ({
     name: pkg.name,
     count: jamaahList.filter(j => j.packageId === pkg.id).length
   }));
@@ -47,9 +47,7 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payment
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
-        {/* Main Stats Card */}
         <div className="md:col-span-4 bg-emerald-950 text-white p-12 rounded-[3rem] shadow-2xl shadow-emerald-900/30 flex flex-col justify-center">
           <p className="text-emerald-300 text-xs uppercase font-bold tracking-[0.3em] mb-4">Omzet Bruto (Verified)</p>
           <p className="text-5xl font-serif font-bold mb-8 leading-tight">{formatCurrency(totalRevenue)}</p>
@@ -60,12 +58,11 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payment
             </div>
             <div>
               <p className="text-[10px] text-emerald-300/60 uppercase font-bold mb-1">Paket Laris</p>
-              <p className="text-sm font-bold truncate">{packageStats.sort((a,b) => b.count - a.count)[0]?.name}</p>
+              <p className="text-sm font-bold truncate">{packageStats.length > 0 ? packageStats.sort((a,b) => b.count - a.count)[0]?.name : 'None'}</p>
             </div>
           </div>
         </div>
 
-        {/* Breakdown Charts (Mock) */}
         <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/30 border border-slate-100">
               <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-10 border-b pb-4">Distribusi Paket</h4>
@@ -107,7 +104,6 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payment
         </div>
       </div>
 
-      {/* Main Table Content */}
       <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fadeIn">
         <div className="px-12 py-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
           <h3 className="text-2xl font-serif font-bold text-emerald-950">
@@ -138,8 +134,8 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payment
                       <div className="text-xs text-slate-400 font-bold uppercase tracking-tighter mt-1">{j.registrationNumber}</div>
                     </td>
                     <td className="px-12 py-6">
-                      <div className="text-sm font-bold text-slate-700">{UMRAH_PACKAGES.find(p => p.id === j.packageId)?.name}</div>
-                      <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">{UMRAH_PACKAGES.find(p => p.id === j.packageId)?.departureDate}</div>
+                      <div className="text-sm font-bold text-slate-700">{packages.find(p => p.id === j.packageId)?.name || 'Deleted Package'}</div>
+                      <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">{packages.find(p => p.id === j.packageId)?.departureDate || '-'}</div>
                     </td>
                     <td className="px-12 py-6">
                       <div className="flex space-x-2">
@@ -183,24 +179,6 @@ const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ jamaahList, payment
                 })}
               </tbody>
             </table>
-          )}
-
-          {reportType === 'finance' && (
-            <div className="p-24 text-center">
-              <div className="w-32 h-32 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 text-5xl">📊</div>
-              <h4 className="text-3xl font-serif font-bold text-emerald-950 mb-4">Laporan Keuangan Strategis</h4>
-              <p className="text-slate-500 max-w-lg mx-auto leading-relaxed text-lg">Halaman ini memuat visualisasi real-time perbandingan Cash-in vs Cash-out, margin laba kotor per kloter, serta proyeksi pertumbuhan tahunan.</p>
-              <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                <div className="text-left p-10 bg-slate-50 rounded-[2.5rem] border border-slate-100">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4">Piutang Belum Terbayar</p>
-                  <p className="text-4xl font-serif font-bold text-amber-600 leading-tight">{formatCurrency(totalReceivables)}</p>
-                </div>
-                <div className="text-left p-10 bg-emerald-950 text-white rounded-[2.5rem] shadow-2xl shadow-emerald-900/20">
-                  <p className="text-[10px] text-emerald-300/60 uppercase font-bold tracking-[0.2em] mb-4">Kas Bersih Verified</p>
-                  <p className="text-4xl font-serif font-bold leading-tight">{formatCurrency(totalRevenue)}</p>
-                </div>
-              </div>
-            </div>
           )}
         </div>
       </div>

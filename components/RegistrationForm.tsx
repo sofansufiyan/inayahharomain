@@ -1,20 +1,20 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { UmrahPackage, BookingForm } from '../types';
-import { UMRAH_PACKAGES } from '../constants';
 
 interface RegistrationFormProps {
+  packages: UmrahPackage[];
   initialPackage: UmrahPackage | null;
   onSuccess: (data: BookingForm) => void;
 }
 
-const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onSuccess }) => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ packages, initialPackage, onSuccess }) => {
   const [formData, setFormData] = useState<BookingForm>({
     id: '',
     fullName: '',
     phone: '',
     email: '',
-    packageId: initialPackage?.id || UMRAH_PACKAGES[0].id,
+    packageId: initialPackage?.id || (packages.length > 0 ? packages[0].id : ''),
     numberOfPersons: 1,
     notes: '',
     relationship: 'Kepala Keluarga',
@@ -67,7 +67,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call and generation of registration number
     setTimeout(() => {
       const regNum = `REG-${Math.floor(100000 + Math.random() * 900000)}`;
       setFormData(prev => ({ ...prev, registrationNumber: regNum }));
@@ -82,7 +81,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
   };
 
   if (showSummary) {
-    const selectedPkg = UMRAH_PACKAGES.find(p => p.id === formData.packageId);
+    const selectedPkg = packages.find(p => p.id === formData.packageId);
     return (
       <div className="container mx-auto px-4 py-10">
         <div ref={printRef} className="max-w-4xl mx-auto bg-white p-8 md:p-16 rounded-3xl shadow-2xl border border-gray-100 print:shadow-none print:border-none print:p-0 animate-scaleIn">
@@ -108,7 +107,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
           <h3 className="text-2xl font-bold text-center mb-10 text-emerald-950 uppercase underline decoration-emerald-500 decoration-4 underline-offset-8">Formulir Pendaftaran Jama'ah</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-            {/* Section 1: Data Paket */}
             <section className="bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100">
               <h4 className="text-emerald-800 font-bold uppercase text-xs tracking-widest mb-6 border-b border-emerald-200 pb-2">I. Paket Perjalanan</h4>
               <div className="space-y-4 text-sm">
@@ -118,7 +116,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
               </div>
             </section>
 
-            {/* Section 2: Data Identitas */}
             <section className="bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100">
               <h4 className="text-emerald-800 font-bold uppercase text-xs tracking-widest mb-6 border-b border-emerald-200 pb-2">II. Identitas Diri</h4>
               <div className="space-y-4 text-sm">
@@ -184,7 +181,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row animate-scaleIn">
-          {/* Navigation Sidebar */}
           <div className="md:w-80 bg-emerald-950 p-10 text-white border-r border-white/5">
             <h3 className="text-xl font-bold mb-10 pb-4 border-b border-white/10">Alur Pendaftaran</h3>
             <div className="space-y-10">
@@ -204,20 +200,25 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
             
             <div className="mt-24 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md">
               <p className="text-xs text-amber-500 uppercase font-bold tracking-widest mb-3">Paket Anda</p>
-              <h4 className="font-serif text-lg font-bold mb-2">{UMRAH_PACKAGES.find(p => p.id === formData.packageId)?.name}</h4>
-              <p className="text-sm text-emerald-100/60 leading-tight">Harga mulai {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(UMRAH_PACKAGES.find(p => p.id === formData.packageId)?.price || 0)}</p>
+              <h4 className="font-serif text-lg font-bold mb-2">{packages.find(p => p.id === formData.packageId)?.name || 'Pilih Paket'}</h4>
+              <p className="text-sm text-emerald-100/60 leading-tight">Mulai perjalanan ibadah Anda bersama kami.</p>
             </div>
           </div>
 
-          {/* Form Content */}
           <div className="flex-grow p-10 md:p-14 space-y-16 overflow-y-auto max-h-[800px]">
-            {/* Identitas Section */}
             <section>
               <div className="flex items-center mb-10">
                 <span className="text-3xl mr-4">🕋</span>
                 <h3 className="text-2xl font-serif font-bold text-emerald-950">Informasi Identitas Jama'ah</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-slate-700 mb-3">Pilih Paket Umrah</label>
+                  <select name="packageId" value={formData.packageId} onChange={handleChange} required className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none">
+                    <option value="">-- Pilih Paket --</option>
+                    {packages.map(p => <option key={p.id} value={p.id}>{p.name} ({p.departureDate})</option>)}
+                  </select>
+                </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-slate-700 mb-3">Nama Lengkap Sesuai Paspor</label>
                   <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" placeholder="Contoh: Muhammad Ali" />
@@ -259,7 +260,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
               </div>
             </section>
 
-            {/* Passport Section */}
             <section className="bg-emerald-50/50 p-10 rounded-[2rem] border border-emerald-100">
               <div className="flex items-center mb-8">
                 <span className="text-3xl mr-4">🛂</span>
@@ -282,46 +282,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
                     <label className="block text-sm font-bold text-slate-700 mb-3">Nomor Paspor</label>
                     <input type="text" name="passportNumber" required value={formData.passportNumber} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" placeholder="Contoh: A 1234567" />
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3">Unggah Scan Paspor (Halaman Depan)</label>
-                    <div className="relative h-40 border-2 border-dashed border-emerald-200 bg-white rounded-2xl flex flex-col items-center justify-center group hover:bg-emerald-50 transition-all cursor-pointer">
-                      <input type="file" name="passportScan" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-                      <svg className="w-10 h-10 text-emerald-500 mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                      <p className="text-sm font-bold text-emerald-700">{formData.passportScan || "Klik atau Seret File Disini"}</p>
-                    </div>
-                  </div>
                 </div>
               )}
-            </section>
-
-            {/* Documents Section */}
-            <section>
-              <div className="flex items-center mb-10">
-                <span className="text-3xl mr-4">📂</span>
-                <h3 className="text-2xl font-serif font-bold text-emerald-950">Kelengkapan Dokumen</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  { label: 'KTP Asli / Scan', name: 'ktpScan', icon: '🆔' },
-                  { label: 'Kartu Keluarga', name: 'kkScan', icon: '👨‍👩‍👧‍👦' },
-                  { label: 'Akta Lahir', name: 'aktaScan', icon: '🍼' },
-                  { label: 'Pas Foto 4x6 (Background Putih)', name: 'photoScan', icon: '📸' },
-                  { label: 'Buku Nikah (Jika Suami Istri)', name: 'marriageScan', icon: '💍' },
-                ].map((doc) => (
-                  <div key={doc.name} className="p-6 bg-slate-50 border border-slate-200 rounded-3xl hover:border-emerald-500/30 transition-all group">
-                    <div className="flex items-center mb-4">
-                      <span className="text-xl mr-3">{doc.icon}</span>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{doc.label}</label>
-                    </div>
-                    <div className="relative overflow-hidden flex items-center">
-                      <input type="file" name={doc.name} onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                      <div className="w-full py-3 px-5 rounded-xl bg-white border border-slate-100 text-[10px] font-bold text-emerald-600 truncate group-hover:bg-emerald-50 transition-colors">
-                        {formData[doc.name as keyof BookingForm] || "Pilih File JPG/PNG/PDF"}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </section>
 
             <div className="pt-10">
@@ -339,7 +301,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ initialPackage, onS
                   </span>
                 )}
               </button>
-              <p className="text-center text-xs text-slate-400 mt-6 italic">Data yang Anda kirimkan terproteksi oleh enkripsi SSL Ar-Rayan Travel.</p>
             </div>
           </div>
         </form>

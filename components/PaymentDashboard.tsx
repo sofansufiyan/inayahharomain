@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
 import { BookingForm, PaymentRecord, UmrahPackage } from '../types';
-import { UMRAH_PACKAGES } from '../constants';
 
 interface PaymentDashboardProps {
   jamaahList: BookingForm[];
   payments: PaymentRecord[];
+  packages: UmrahPackage[];
   onAddPayment: (p: PaymentRecord) => void;
   onUpdatePayment: (p: PaymentRecord) => void;
 }
 
-const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payments, onAddPayment, onUpdatePayment }) => {
+const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payments, packages, onAddPayment, onUpdatePayment }) => {
   const [selectedJamaahId, setSelectedJamaahId] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paymentForm, setPaymentForm] = useState<Partial<PaymentRecord>>({
@@ -21,7 +21,7 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
   });
 
   const selectedJamaah = jamaahList.find(j => j.id === selectedJamaahId);
-  const selectedPackage = selectedJamaah ? UMRAH_PACKAGES.find(p => p.id === selectedJamaah.packageId) : null;
+  const selectedPackage = selectedJamaah ? packages.find(p => p.id === selectedJamaah.packageId) : null;
   
   const totalBill = selectedPackage ? selectedPackage.price * selectedJamaah!.numberOfPersons : 0;
   const jamaahPayments = payments.filter(p => p.jamaahId === selectedJamaahId && p.status === 'Diterima');
@@ -55,7 +55,6 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Billing Column */}
         <div className="lg:col-span-4">
           <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-10 border border-slate-100 sticky top-28">
             <h3 className="text-2xl font-serif font-bold text-emerald-950 mb-10">Informasi Tagihan</h3>
@@ -81,7 +80,7 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
                   <p className="text-[10px] text-emerald-300 font-bold uppercase tracking-[0.2em] mb-2">Estimasi Tagihan Total</p>
                   <p className="text-3xl font-bold font-serif">{formatCurrency(totalBill)}</p>
                   <div className="mt-4 pt-4 border-t border-white/10 text-xs text-emerald-100/60 font-medium">
-                    {selectedPackage?.name} x {selectedJamaah.numberOfPersons} Orang
+                    {selectedPackage?.name || 'Paket Tidak Ditemukan'} x {selectedJamaah.numberOfPersons} Orang
                   </div>
                 </div>
 
@@ -120,9 +119,7 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
           </div>
         </div>
 
-        {/* List Column */}
         <div className="lg:col-span-8 space-y-10">
-          {/* Pending Verification */}
           <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fadeIn">
             <div className="bg-amber-500 px-10 py-5 flex justify-between items-center">
               <h3 className="font-bold text-emerald-950 flex items-center text-lg">
@@ -170,7 +167,6 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
             </div>
           </div>
 
-          {/* All History Table */}
           <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
             <div className="px-10 py-6 border-b border-slate-100 flex justify-between items-center">
               <h3 className="font-serif font-bold text-2xl text-emerald-950">Jurnal Keuangan</h3>
@@ -204,15 +200,11 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
                   })}
                 </tbody>
               </table>
-              {payments.filter(p => p.status !== 'Menunggu Verifikasi').length === 0 && (
-                <div className="py-20 text-center text-slate-300 italic font-serif">Belum ada riwayat transaksi.</div>
-              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Payment Form Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
           <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-md" onClick={() => setIsModalOpen(false)}></div>
@@ -252,25 +244,9 @@ const PaymentDashboard: React.FC<PaymentDashboardProps> = ({ jamaahList, payment
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Catatan Tambahan</label>
-                <input 
-                  type="text" 
-                  value={paymentForm.notes} 
-                  onChange={(e) => setPaymentForm({...paymentForm, notes: e.target.value})}
-                  className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none" 
-                  placeholder="Misal: Cicilan ke-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Bukti Transfer (JPG/PNG)</label>
-                <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center text-slate-400 text-sm hover:bg-slate-50 transition-all cursor-pointer">
-                  Klik untuk pilih file...
-                </div>
-              </div>
             </div>
             <div className="flex gap-4 mt-12">
-              <button type="submit" className="flex-grow py-5 bg-emerald-950 text-white font-bold rounded-2xl hover:bg-black transition-all shadow-xl shadow-emerald-900/20">Simpan Jurnal</button>
+              <button type="submit" className="flex-grow py-5 bg-emerald-950 text-white rounded-2xl font-bold shadow-xl shadow-emerald-900/20">Simpan Jurnal</button>
               <button type="button" onClick={() => setIsModalOpen(false)} className="px-10 py-5 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all">Batal</button>
             </div>
           </form>
