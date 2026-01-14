@@ -1,5 +1,13 @@
 
-import { UmrahPackage, BookingForm, PaymentRecord } from './types';
+import { UmrahPackage, BookingForm, PaymentRecord, SystemSettings } from './types';
+
+export const INITIAL_SETTINGS: SystemSettings = {
+  agencyName: 'Ar-Rayan Travel',
+  kemenagLicense: 'No. 123/2020',
+  supportEmail: 'info@arrayantravel.com',
+  hotlineWhatsapp: '6281234567890',
+  address: 'Jl. Kebangkitan No. 123, Jakarta Selatan, Indonesia'
+};
 
 export const UMRAH_PACKAGES: UmrahPackage[] = [
   {
@@ -29,34 +37,6 @@ export const UMRAH_PACKAGES: UmrahPackage[] = [
     inclusions: ['Tiket Pesawat PP Executive', 'Visa Umrah Fast Track', 'Full Board Hotel 5*', 'Handling VIP', 'Kereta Cepat Madinah-Makkah'],
     exclusions: ['Paspor', 'Kebutuhan Pribadi', 'Loundry'],
     isPopular: true
-  },
-  {
-    id: 'pkg-003',
-    name: 'Umrah Plus Turki',
-    price: 42000000,
-    duration: 14,
-    airline: 'Turkish Airlines',
-    hotelMadinah: 'Frontel Al Harithia (⭐⭐⭐⭐⭐)',
-    hotelMakkah: 'Hilton Convention (⭐⭐⭐⭐⭐)',
-    departureDate: '05 Desember 2024',
-    image: 'https://images.unsplash.com/photo-1565552645632-d7c5f76a16be?auto=format&fit=crop&w=800&q=80',
-    inclusions: ['Tiket Pesawat PP', 'Visa Umrah & Turki', 'City Tour Istanbul', 'Makan 3x Sehari', 'Bimbingan Manasik'],
-    exclusions: ['Paspor', 'Tips Tour Guide Turki', 'Pengeluaran Pribadi'],
-    isPopular: false
-  },
-  {
-    id: 'pkg-004',
-    name: 'Umrah Ramadhan Awal',
-    price: 32000000,
-    duration: 10,
-    airline: 'Etihad Airways',
-    hotelMadinah: 'Nawazi Madinah (⭐⭐⭐⭐)',
-    hotelMakkah: 'Anjum Hotel (⭐⭐⭐⭐⭐)',
-    departureDate: '12 Maret 2025',
-    image: 'https://images.unsplash.com/photo-1564769662533-4f00a87b4056?auto=format&fit=crop&w=800&q=80',
-    inclusions: ['Tiket Pesawat PP', 'Visa Umrah', 'Saur & Buka Puasa', 'Mutawif Berpengalaman'],
-    exclusions: ['Paspor', 'Vaksin', 'Laundry'],
-    isPopular: false
   }
 ];
 
@@ -77,30 +57,9 @@ export const INITIAL_JAMAAH_DATA: BookingForm[] = [
     passportStatus: 'Punya',
     passportNumber: 'A1234567',
     registrationNumber: 'REG-882910',
-    // Added missing registrationDate
     registrationDate: '2024-08-15T10:00:00.000Z',
     registrationStatus: 'Confirmed',
     paymentStatus: 'Lunas'
-  },
-  {
-    id: 'jam-002',
-    fullName: 'Siti Aminah',
-    phone: '081987654321',
-    email: 'siti@example.com',
-    packageId: 'pkg-001',
-    numberOfPersons: 1,
-    notes: '',
-    relationship: 'Istri',
-    placeOfBirth: 'Bandung',
-    dateOfBirth: '1988-08-22',
-    age: 36,
-    address: 'Jl. Dago No. 12, Bandung',
-    passportStatus: 'Belum',
-    registrationNumber: 'REG-129034',
-    // Added missing registrationDate
-    registrationDate: '2024-09-01T14:30:00.000Z',
-    registrationStatus: 'Pending',
-    paymentStatus: 'DP'
   }
 ];
 
@@ -108,38 +67,10 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
   {
     id: 'pay-001',
     jamaahId: 'jam-001',
-    amount: 70000000, // VIP for 2 persons
+    amount: 70000000,
     method: 'Transfer Bank',
     date: '2024-09-01',
     status: 'Diterima',
     notes: 'Pelunasan Umrah VIP'
-  },
-  {
-    id: 'pay-002',
-    jamaahId: 'jam-002',
-    amount: 10000000,
-    method: 'DP',
-    date: '2024-09-05',
-    status: 'Diterima',
-    notes: 'DP Pendaftaran'
-  },
-  {
-    id: 'pay-003',
-    jamaahId: 'jam-002',
-    amount: 5000000,
-    method: 'Cicilan',
-    date: '2024-09-15',
-    status: 'Menunggu Verifikasi',
-    notes: 'Cicilan ke-1'
   }
 ];
-
-export const CONTACT_INFO = {
-  whatsapp: '6281234567890',
-  email: 'info@arrayantravel.com',
-  address: 'Jl. Kebangkitan No. 123, Jakarta Selatan, Indonesia',
-  social: {
-    instagram: '@arrayantravel',
-    facebook: 'Ar-Rayan Travel Umrah'
-  }
-};

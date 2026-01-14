@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { UmrahPackage, BookingForm } from '../types';
+import { UmrahPackage, BookingForm, SystemSettings } from '../types';
 
 interface RegistrationFormProps {
   packages: UmrahPackage[];
+  // Added settings prop
+  settings: SystemSettings;
   initialPackage: UmrahPackage | null;
   onSuccess: (data: BookingForm) => void;
 }
 
-const RegistrationForm: React.FC<RegistrationFormProps> = ({ packages, initialPackage, onSuccess }) => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ packages, settings, initialPackage, onSuccess }) => {
   const [formData, setFormData] = useState<BookingForm>({
     id: '',
     fullName: '',
@@ -89,11 +91,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ packages, initialPa
           <div className="flex flex-col md:flex-row justify-between items-start mb-10 border-b-2 border-emerald-900 pb-8">
             <div className="flex items-center">
                <div className="w-16 h-16 bg-emerald-900 rounded-2xl flex items-center justify-center mr-4">
-                 <span className="text-3xl font-bold text-white">A</span>
+                 <span className="text-3xl font-bold text-white">{settings.agencyName[0]}</span>
                </div>
                <div>
-                  <h2 className="text-3xl font-serif font-bold text-emerald-900 uppercase tracking-tighter">Ar-Rayan Travel</h2>
-                  <p className="text-xs text-gray-500 uppercase font-bold">Izin Kemenag PPIU No. 123/2020</p>
+                  <h2 className="text-3xl font-serif font-bold text-emerald-900 uppercase tracking-tighter">{settings.agencyName}</h2>
+                  <p className="text-xs text-gray-500 uppercase font-bold">Izin Kemenag PPIU {settings.kemenagLicense}</p>
                </div>
             </div>
             <div className="mt-4 md:mt-0 text-right">
@@ -143,7 +145,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ packages, initialPa
             <div className="text-center w-full">
               <p className="text-[10px] text-gray-400 mb-24 uppercase font-bold tracking-widest">Petugas Pendaftaran</p>
               <div className="w-full border-b-2 border-emerald-950 mb-2"></div>
-              <p className="font-bold text-xs uppercase">Ar-Rayan Travel Admin</p>
+              <p className="font-bold text-xs uppercase">{settings.agencyName} Admin</p>
             </div>
             <div className="text-center w-full">
               <p className="text-[10px] text-gray-400 mb-24 uppercase font-bold tracking-widest">Jama'ah Ybs</p>

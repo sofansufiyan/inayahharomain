@@ -11,6 +11,7 @@
       body {
         font-family: 'Plus+Jakarta+Sans', sans-serif;
         scroll-behavior: smooth;
+        background-color: #f0faf7; /* Mint Green Background */
       }
       .font-serif {
         font-family: 'Playfair Display', serif;
@@ -33,6 +34,11 @@
         animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
       
+      /* Smooth transitions for all interactive elements */
+      button, a, input, select {
+        transition: all 0.2s ease-in-out;
+      }
+
       /* Print optimization */
       @media print {
         .no-print { display: none !important; }
@@ -45,12 +51,13 @@
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0"
   }
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-900">
+  <body class="text-slate-900">
     <div id="root"></div>
   </body>
 </html>

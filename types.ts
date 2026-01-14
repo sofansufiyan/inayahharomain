@@ -14,6 +14,11 @@ export interface UmrahPackage {
   isPopular?: boolean;
 }
 
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
 export interface PaymentRecord {
   id: string;
   jamaahId: string;
@@ -23,6 +28,14 @@ export interface PaymentRecord {
   proofImage?: string;
   status: 'Menunggu Verifikasi' | 'Diterima' | 'Ditolak';
   notes?: string;
+}
+
+export interface SystemSettings {
+  agencyName: string;
+  kemenagLicense: string;
+  supportEmail: string;
+  hotlineWhatsapp: string;
+  address: string;
 }
 
 export interface BookingForm {
@@ -48,7 +61,6 @@ export interface BookingForm {
   marriageScan?: string;
   registrationNumber?: string;
   registrationDate: string;
-  // Admin statuses
   registrationStatus: 'Pending' | 'Confirmed' | 'Canceled';
   paymentStatus: 'Belum Lunas' | 'DP' | 'Lunas';
 }
